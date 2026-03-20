@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz App - Ôn tập & Thi trắc nghiệm</title>
+<style>
+:root {
+  --primary: #1976D2;
+  --primary-light: #E3F2FD;
+  --primary-dark: #1565C0;
+  --success: #2E7D32;
+  --success-light: #E8F5E9;
+  --danger: #D32F2F;
+  --danger-light: #FFEBEE;
+  --warning: #F57F17;
+  --warning-light: #FFF8E1;
+  --gray-50: #FAFAFA;
+  --gray-100: #F5F5F5;
+  --gray-200: #EEEEEE;
+  --gray-300: #E0E0E0;
+  --gray-400: #BDBDBD;
+  --gray-500: #9E9E9E;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
+  --transition: 0.2s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-900);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+}
+header .header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  gap: 8px;
+}
+header .logo {
+  font-weight: 700;
+  font-size: 18px;
+  margin-right: 16px;
+  white-space: nowrap;
+}
+nav { display: flex; gap: 4px; overflow-x: auto; }
+nav a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+nav a.active { background: rgba(255,255,255,0.25); color: white; }
+
+/* Timer in header */
+.header-timer {
+  margin-left: auto;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.header-timer.danger { color: #FF8A80; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.6; } }
+
+/* Main */
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+  transition: var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  line-height: 1.4;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #1B5E20; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #B71C1C; }
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--gray-300);
+  color: var(--gray-700);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-block { width: 100%; justify-content: center; }
+
+/* Forms */
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--gray-700);
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: inherit;
+  transition: var(--transition);
+  background: white;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+/* Radio options for correct answer */
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.answer-row input[type="text"] { flex: 1; }
+.answer-row input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--success);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Quiz option */
+.option {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+  line-height: 1.5;
+}
+.option:hover { border-color: var(--primary); background: var(--primary-light); }
+.option.selected { border-color: var(--primary); background: var(--primary-light); }
+.option.correct { border-color: var(--success); background: var(--success-light); color: var(--success); font-weight: 600; }
+.option.wrong { border-color: var(--danger); background: var(--danger-light); color: var(--danger); font-weight: 600; }
+.option.disabled { pointer-events: none; opacity: 0.85; }
+.option .option-label {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--gray-200);
+  font-weight: 700;
+  font-size: 13px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.option.correct .option-label { background: var(--success); color: white; }
+.option.wrong .option-label { background: var(--danger); color: white; }
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Question nav (exam) */
+.question-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.question-nav .q-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.question-nav .q-btn.current { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.question-nav .q-btn.answered { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--gray-200);
+}
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-500);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: var(--transition);
+}
+.tab-btn:hover { color: var(--gray-700); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+/* Dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: center;
+}
+.stat-card .stat-number {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.stat-card .stat-label {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-top: 4px;
+}
+.stat-card .stat-action { margin-top: 16px; }
+
+/* Result */
+.result-score {
+  text-align: center;
+  padding: 32px;
+}
+.result-score .score-number {
+  font-size: 48px;
+  font-weight: 700;
+}
+.result-score .score-label {
+  font-size: 16px;
+  color: var(--gray-600);
+  margin-top: 4px;
+}
+.result-score.good .score-number { color: var(--success); }
+.result-score.bad .score-number { color: var(--danger); }
+
+/* Review item */
+.review-item {
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.review-item.correct-review { border-left: 4px solid var(--success); }
+.review-item.wrong-review { border-left: 4px solid var(--danger); }
+.review-item .q-text { font-weight: 600; margin-bottom: 8px; }
+.review-item .answer-line { font-size: 14px; margin: 2px 0; }
+.review-item .answer-line.user-wrong { color: var(--danger); }
+.review-item .answer-line.correct-ans { color: var(--success); font-weight: 600; }
+.review-item .answer-line.not-answered { color: var(--gray-500); font-style: italic; }
+
+/* Toast */
+#toast-container {
+  position: fixed;
+  top: 70px;
+  right: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+  max-width: 340px;
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.info { background: var(--primary); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--gray-500);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { margin-bottom: 16px; }
+
+/* Checkbox list for exam */
+.checkbox-list { max-height: 400px; overflow-y: auto; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); }
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--gray-200);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.checkbox-item:last-child { border-bottom: none; }
+.checkbox-item:hover { background: var(--gray-50); }
+.checkbox-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.checkbox-item .q-preview { font-size: 14px; flex: 1; }
+
+/* Confirm overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.overlay .dialog {
+  background: white;
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+.overlay .dialog h3 { margin-bottom: 12px; }
+.overlay .dialog p { color: var(--gray-600); margin-bottom: 20px; }
+.overlay .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  header .logo { font-size: 16px; margin-right: 8px; }
+  nav a { padding: 6px 10px; font-size: 13px; }
+  main { padding: 16px 12px 60px; }
+  .card { padding: 16px; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .result-score .score-number { font-size: 36px; }
+  .question-nav .q-btn { width: 32px; height: 32px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Quiz App</div>
+    <nav id="main-nav">
+      <a href="#home" data-nav="home">Trang chủ</a>
+      <a href="#bank" data-nav="bank">Ngân hàng</a>
+      <a href="#exams" data-nav="exams">Đề thi</a>
+      <a href="#history" data-nav="history">Lịch sử</a>
+    </nav>
+    <div class="header-timer" id="header-timer" style="display:none;"></div>
+  </div>
+</header>
+
+<main id="app"></main>
+<div id="toast-container"></div>
+
+<script>
+// ========================
+// 1. UTILITIES
+// ========================
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 2500);
+}
+
+function showConfirm(title, message) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.innerHTML = `
+      <div class="dialog">
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(message)}</p>
+        <div class="dialog-actions">
+          <button class="btn btn-outline" id="confirm-cancel">Huỷ</button>
+          <button class="btn btn-danger" id="confirm-ok">Đồng ý</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#confirm-cancel').onclick = () => { overlay.remove(); resolve(false); };
+    overlay.querySelector('#confirm-ok').onclick = () => { overlay.remove(); resolve(true); };
+  });
+}
+
+const LABELS = ['A', 'B', 'C', 'D'];
+
+// ========================
+// 2. DATA LAYER
+// ========================
+const Store = {
+  _get(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } },
+  _set(key, val) { localStorage.setItem(key, JSON.stringify(val)); },
+
+  // Questions
+  getQuestions() { return this._get('quiz_questions'); },
+  saveQuestions(qs) { this._set('quiz_questions', qs); },
+  addQuestion(q) { const qs = this.getQuestions(); q.id = generateId(); q.createdAt = Date.now(); qs.push(q); this.saveQuestions(qs); return q; },
+  updateQuestion(id, data) { const qs = this.getQuestions().map(q => q.id === id ? {...q, ...data} : q); this.saveQuestions(qs); },
+  deleteQuestion(id) { this.saveQuestions(this.getQuestions().filter(q => q.id !== id)); },
+  getQuestion(id) { return this.getQuestions().find(q => q.id === id); },
+
+  // Exams
+  getExams() { return this._get('quiz_exams'); },
+  saveExams(es) { this._set('quiz_exams', es); },
+  addExam(e) { const es = this.getExams(); e.id = generateId(); e.createdAt = Date.now(); es.push(e); this.saveExams(es); return e; },
+  updateExam(id, data) { const es = this.getExams().map(e => e.id === id ? {...e, ...data} : e); this.saveExams(es); },
+  deleteExam(id) { this.saveExams(this.getExams().filter(e => e.id !== id)); },
+  getExam(id) { return this.getExams().find(e => e.id === id); },
+
+  // Practice History
+  getPracticeHistory() { return this._get('quiz_practice_history'); },
+  addPracticeHistory(h) { const hs = this.getPracticeHistory(); h.id = generateId(); h.timestamp = Date.now(); hs.unshift(h); this._set('quiz_practice_history', hs); return h; },
+
+  // Exam History
+  getExamHistory() { return this._get('quiz_exam_history'); },
+  addExamHistory(h) { const hs = this.getExamHistory(); h.id = generateId(); h.timestamp = Date.now(); hs.unshift(h); this._set('quiz_exam_history', hs); return h; },
+};
+
+// ========================
+// 3. ROUTER
+// ========================
+let currentExamSession = null;
+let examTimerInterval = null;
+
+function getRoute() {
+  const raw = location.hash.slice(1) || 'home';
+  const hashOnly = raw.split('?')[0];
+  const parts = hashOnly.split('/');
+  return { path: parts[0], sub: parts[1] || null, param: parts[2] || null };
+}
+
+function navigate(hash) {
+  location.hash = hash;
+}
+
+function updateNav() {
+  const route = getRoute();
+  document.querySelectorAll('#main-nav a').forEach(a => {
+    a.classList.toggle('active', a.dataset.nav === route.path);
+  });
+}
+
+function router() {
+  updateNav();
+  const route = getRoute();
+  const app = document.getElementById('app');
+  const timer = document.getElementById('header-timer');
+
+  // Clear exam timer if navigating away from exam
+  if (!(route.path === 'exam' && route.sub)) {
+    clearExamTimer();
+    timer.style.display = 'none';
+  }
+
+  switch (route.path) {
+    case 'home': renderHome(app); break;
+    case 'bank':
+      if (route.sub === 'add') renderQuestionForm(app);
+      else if (route.sub === 'edit' && route.param) renderQuestionForm(app, route.param);
+      else renderBank(app);
+      break;
+    case 'practice': renderPractice(app); break;
+    case 'exams':
+      if (route.sub === 'add') renderExamForm(app);
+      else if (route.sub === 'edit' && route.param) renderExamForm(app, route.param);
+      else renderExams(app);
+      break;
+    case 'exam':
+      if (route.sub) renderExamSession(app, route.sub);
+      break;
+    case 'history':
+      if (route.sub && route.param) renderHistoryDetail(app, route.sub, route.param);
+      else renderHistory(app);
+      break;
+    default: renderHome(app);
+  }
+}
+
+window.addEventListener('hashchange', router);
+window.addEventListener('load', router);
+
+// Warn before leaving during exam
+window.addEventListener('beforeunload', e => {
+  if (currentExamSession && !currentExamSession.finished) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+function clearExamTimer() {
+  if (examTimerInterval) { clearInterval(examTimerInterval); examTimerInterval = null; }
+}
+
+// ========================
+// 4. VIEWS
+// ========================
+
+// --- HOME ---
+function renderHome(app) {
+  const qs = Store.getQuestions();
+  const es = Store.getExams();
+  const ph = Store.getPracticeHistory();
+  const eh = Store.getExamHistory();
+  const totalSessions = ph.length + eh.length;
+  const allScores = [...ph, ...eh];
+  const avgScore = allScores.length ? Math.round(allScores.reduce((s, h) => s + (h.score / h.total) * 100, 0) / allScores.length) : 0;
+
+  app.innerHTML = `
+    <h2 style="margin-bottom:20px;">Trang chủ</h2>
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-number">${qs.length}</div>
+        <div class="stat-label">Câu hỏi trong ngân hàng</div>
+        <div class="stat-action"><a href="#bank" class="btn btn-primary btn-sm">Quản lý</a></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${qs.length > 0 ? '&#9654;' : '0'}</div>
+        <div class="stat-label">Ôn tập ngẫu nhiên</div>
+        <div class="stat-action">
+          <button class="btn btn-success btn-sm" onclick="startPractice()" ${qs.length === 0 ? 'disabled' : ''}>Bắt đầu ôn tập</button>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${es.length}</div>
+        <div class="stat-label">Đề thi</div>
+        <div class="stat-action"><a href="#exams" class="btn btn-primary btn-sm">Quản lý</a></div>
+      </div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-number">${totalSessions}</div>
+        <div class="stat-label">Tổng số lượt làm bài</div>
+        <div class="stat-action"><a href="#history" class="btn btn-outline btn-sm">Xem lịch sử</a></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${avgScore}%</div>
+        <div class="stat-label">Điểm trung bình</div>
+      </div>
+    </div>`;
+}
+
+function startPractice() {
+  navigate('practice');
+}
+
+// --- QUESTION BANK ---
+function renderBank(app) {
+  const qs = Store.getQuestions();
+  let html = `
+    <div class="card-header">
+      <h2>Ngân hàng câu hỏi</h2>
+      <a href="#bank/add" class="btn btn-primary btn-sm">+ Thêm câu hỏi</a>
+    </div>`;
+  if (qs.length === 0) {
+    html += `<div class="empty-state"><div class="empty-icon">&#128218;</div><p>Chưa có câu hỏi nào.</p><a href="#bank/add" class="btn btn-primary">Thêm câu hỏi đầu tiên</a></div>`;
+  } else {
+    qs.forEach((q, i) => {
+      html += `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+            <div style="flex:1;"><strong>Câu ${i+1}:</strong> ${escapeHtml(q.text)}</div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <a href="#bank/edit/${q.id}" class="btn btn-outline btn-sm">Sửa</a>
+              <button class="btn btn-danger btn-sm" onclick="deleteQuestion('${q.id}')">Xoá</button>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            ${q.answers.map((a, j) => `<div style="padding:4px 0;${j === q.correctIndex ? 'color:var(--success);font-weight:600;' : ''}">${LABELS[j]}. ${escapeHtml(a)} ${j === q.correctIndex ? '&#10003;' : ''}</div>`).join('')}
+          </div>
+        </div>`;
+    });
+  }
+  app.innerHTML = html;
+}
+
+async function deleteQuestion(id) {
+  if (await showConfirm('Xoá câu hỏi', 'Bạn có chắc muốn xoá câu hỏi này?')) {
+    Store.deleteQuestion(id);
+    showToast('Đã xoá câu hỏi', 'success');
+    router();
+  }
+}
+
+function renderQuestionForm(app, editId) {
+  const q = editId ? Store.getQuestion(editId) : null;
+  const isEdit = !!q;
+  app.innerHTML = `
+    <div class="card">
+      <h2 style="margin-bottom:20px;">${isEdit ? 'Sửa câu hỏi' : 'Thêm câu hỏi'}</h2>
+      <form id="question-form">
+        <div class="form-group">
+          <label>Câu hỏi</label>
+          <textarea id="q-text" required placeholder="Nhập nội dung câu hỏi...">${isEdit ? escapeHtml(q.text) : ''}</textarea>
+        </div>
+        <label style="font-weight:600;font-size:14px;color:var(--gray-700);margin-bottom:10px;display:block;">Các đáp án (chọn đáp án đúng)</label>
+        ${[0,1,2,3].map(i => `
+          <div class="answer-row">
+            <input type="radio" name="correct" value="${i}" ${(isEdit && q.correctIndex === i) || (!isEdit && i === 0) ? 'checked' : ''} required>
+            <span style="font-weight:600;width:20px;">${LABELS[i]}.</span>
+            <input type="text" id="ans-${i}" placeholder="Đáp án ${LABELS[i]}" value="${isEdit ? escapeHtml(q.answers[i]) : ''}" required>
+          </div>`).join('')}
+        <div style="margin-top:20px;display:flex;gap:10px;">
+          <button type="submit" class="btn btn-primary">${isEdit ? 'Cập nhật' : 'Thêm câu hỏi'}</button>
+          <a href="#bank" class="btn btn-outline">Huỷ</a>
+        </div>
+      </form>
+    </div>`;
+  document.getElementById('question-form').onsubmit = e => {
+    e.preventDefault();
+    const text = document.getElementById('q-text').value.trim();
+    const answers = [0,1,2,3].map(i => document.getElementById(`ans-${i}`).value.trim());
+    const correctIndex = parseInt(document.querySelector('input[name="correct"]:checked').value);
+    if (!text || answers.some(a => !a)) { showToast('Vui lòng điền đầy đủ', 'error'); return; }
+    if (isEdit) {
+      Store.updateQuestion(editId, { text, answers, correctIndex });
+      showToast('Đã cập nhật câu hỏi', 'success');
+    } else {
+      Store.addQuestion({ text, answers, correctIndex });
+      showToast('Đã thêm câu hỏi', 'success');
+    }
+    navigate('bank');
+  };
+}
+
+// --- PRACTICE ---
+let practiceSession = null;
+
+function renderPractice(app) {
+  const qs = Store.getQuestions();
+  if (qs.length === 0) {
+    app.innerHTML = `<div class="empty-state"><div class="empty-icon">&#128218;</div><p>Chưa có câu hỏi nào. Hãy thêm câu hỏi trước.</p><a href="#bank/add" class="btn btn-primary">Thêm câu hỏi</a></div>`;
+    return;
+  }
+  if (!practiceSession || practiceSession.finished) {
+    const shuffled = shuffleArray(qs);
+    const selected = shuffled.slice(0, Math.min(20, shuffled.length));
+    practiceSession = {
+      questions: selected.map(q => ({...q})),
+      selectedAnswers: new Array(selected.length).fill(-1),
+      currentIndex: 0,
+      answered: false,
+      finished: false,
+    };
+  }
+  renderPracticeQuestion(app);
+}
+
+function renderPracticeQuestion(app) {
+  const s = practiceSession;
+  if (s.finished) { renderPracticeResult(app); return; }
+  const q = s.questions[s.currentIndex];
+  const progress = ((s.currentIndex) / s.questions.length * 100);
+  const isLast = s.currentIndex === s.questions.length - 1;
+  const answered = s.selectedAnswers[s.currentIndex] !== -1;
+
+  let html = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-weight:600;color:var(--gray-600);">Câu ${s.currentIndex + 1} / ${s.questions.length}</span>
+      </div>
+      <div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div>
+      <h3 style="margin-bottom:16px;line-height:1.6;">${escapeHtml(q.text)}</h3>
+      <div id="practice-options">`;
+  q.answers.forEach((a, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === s.selectedAnswers[s.currentIndex] && i !== q.correctIndex) cls += ' wrong';
+    }
+    html += `<button class="${cls}" onclick="practiceSelect(${i})"><span class="option-label">${LABELS[i]}</span>${escapeHtml(a)}</button>`;
+  });
+  html += `</div>`;
+  if (answered) {
+    if (isLast) {
+      html += `<button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="practiceFinish()">Xem kết quả</button>`;
+    } else {
+      html += `<button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="practiceNext()">Tiếp tục</button>`;
+    }
+  }
+  html += `</div>`;
+  app.innerHTML = html;
+}
+
+function practiceSelect(idx) {
+  const s = practiceSession;
+  if (s.selectedAnswers[s.currentIndex] !== -1) return;
+  s.selectedAnswers[s.currentIndex] = idx;
+  renderPracticeQuestion(document.getElementById('app'));
+}
+
+function practiceNext() {
+  practiceSession.currentIndex++;
+  renderPracticeQuestion(document.getElementById('app'));
+}
+
+function practiceFinish() {
+  const s = practiceSession;
+  s.finished = true;
+  const score = s.questions.reduce((sum, q, i) => sum + (s.selectedAnswers[i] === q.correctIndex ? 1 : 0), 0);
+  Store.addPracticeHistory({
+    questions: s.questions,
+    selectedAnswers: s.selectedAnswers,
+    score: score,
+    total: s.questions.length,
+  });
+  renderPracticeResult(document.getElementById('app'));
+}
+
+function renderPracticeResult(app) {
+  const s = practiceSession;
+  const score = s.questions.reduce((sum, q, i) => sum + (s.selectedAnswers[i] === q.correctIndex ? 1 : 0), 0);
+  const pct = Math.round(score / s.questions.length * 100);
+  const cls = pct >= 50 ? 'good' : 'bad';
+
+  let html = `
+    <div class="card">
+      <div class="result-score ${cls}">
+        <div class="score-number">${score}/${s.questions.length}</div>
+        <div class="score-label">${pct}% đúng</div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;">
+        <button class="btn btn-success" onclick="practiceSession=null;navigate('practice')">Chơi tiếp</button>
+        <a href="#home" class="btn btn-outline">Đóng</a>
+      </div>
+    </div>
+    <h3 style="margin:20px 0 12px;">Chi tiết</h3>`;
+  s.questions.forEach((q, i) => {
+    const sel = s.selectedAnswers[i];
+    const correct = sel === q.correctIndex;
+    html += `
+      <div class="review-item ${correct ? 'correct-review' : 'wrong-review'}">
+        <div class="q-text">Câu ${i+1}: ${escapeHtml(q.text)}</div>
+        ${sel === -1
+          ? `<div class="answer-line not-answered">Chưa trả lời</div><div class="answer-line correct-ans">Đáp án đúng: ${LABELS[q.correctIndex]}. ${escapeHtml(q.answers[q.correctIndex])}</div>`
+          : sel !== q.correctIndex
+            ? `<div class="answer-line user-wrong">Bạn chọn: ${LABELS[sel]}. ${escapeHtml(q.answers[sel])}</div><div class="answer-line correct-ans">Đáp án đúng: ${LABELS[q.correctIndex]}. ${escapeHtml(q.answers[q.correctIndex])}</div>`
+            : `<div class="answer-line correct-ans">Bạn chọn đúng: ${LABELS[sel]}. ${escapeHtml(q.answers[sel])}</div>`}
+      </div>`;
+  });
+  app.innerHTML = html;
+}
+
+// --- EXAM MANAGEMENT ---
+function renderExams(app) {
+  const exams = Store.getExams();
+  let html = `
+    <div class="card-header">
+      <h2>Đề thi</h2>
+      <a href="#exams/add" class="btn btn-primary btn-sm">+ Tạo đề thi</a>
+    </div>`;
+  if (exams.length === 0) {
+    html += `<div class="empty-state"><div class="empty-icon">&#128221;</div><p>Chưa có đề thi nào.</p><a href="#exams/add" class="btn btn-primary">Tạo đề thi đầu tiên</a></div>`;
+  } else {
+    exams.forEach(e => {
+      html += `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+            <div>
+              <h3>${escapeHtml(e.name)}</h3>
+              <div style="color:var(--gray-600);font-size:14px;margin-top:4px;">${e.questionIds.length} câu &bull; ${e.duration} phút</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">
+              <button class="btn btn-success btn-sm" onclick="navigate('exam/${e.id}')">Làm bài</button>
+              <a href="#exams/edit/${e.id}" class="btn btn-outline btn-sm">Sửa</a>
+              <button class="btn btn-danger btn-sm" onclick="deleteExam('${e.id}')">Xoá</button>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+  app.innerHTML = html;
+}
+
+async function deleteExam(id) {
+  if (await showConfirm('Xoá đề thi', 'Bạn có chắc muốn xoá đề thi này?')) {
+    Store.deleteExam(id);
+    showToast('Đã xoá đề thi', 'success');
+    router();
+  }
+}
+
+function renderExamForm(app, editId) {
+  const exam = editId ? Store.getExam(editId) : null;
+  const isEdit = !!exam;
+  const allQuestions = Store.getQuestions();
+  const selectedIds = isEdit ? new Set(exam.questionIds) : new Set();
+
+  let html = `
+    <div class="card">
+      <h2 style="margin-bottom:20px;">${isEdit ? 'Sửa đề thi' : 'Tạo đề thi'}</h2>
+      <form id="exam-form">
+        <div class="form-group">
+          <label>Tên đề thi</label>
+          <input type="text" id="exam-name" required placeholder="VD: Kiểm tra chương 1" value="${isEdit ? escapeHtml(exam.name) : ''}">
+        </div>
+        <div class="form-group">
+          <label>Thời gian (phút)</label>
+          <input type="number" id="exam-duration" required min="1" max="300" placeholder="VD: 30" value="${isEdit ? exam.duration : ''}">
+        </div>
+        <div class="form-group">
+          <label>Chọn câu hỏi từ ngân hàng (${allQuestions.length} câu)</label>`;
+  if (allQuestions.length === 0) {
+    html += `<p style="color:var(--gray-500);font-size:14px;">Chưa có câu hỏi nào trong ngân hàng.</p>`;
+  } else {
+    html += `<div class="checkbox-list" id="question-checklist">`;
+    allQuestions.forEach(q => {
+      html += `
+        <label class="checkbox-item">
+          <input type="checkbox" value="${q.id}" ${selectedIds.has(q.id) ? 'checked' : ''}>
+          <div class="q-preview">${escapeHtml(q.text)}</div>
+        </label>`;
+    });
+    html += `</div>`;
+  }
+  html += `
+        </div>
+        <div style="margin-top:20px;display:flex;gap:10px;">
+          <button type="submit" class="btn btn-primary">${isEdit ? 'Cập nhật' : 'Tạo đề thi'}</button>
+          <a href="#exams" class="btn btn-outline">Huỷ</a>
+        </div>
+      </form>
+    </div>`;
+  app.innerHTML = html;
+
+  document.getElementById('exam-form').onsubmit = e => {
+    e.preventDefault();
+    const name = document.getElementById('exam-name').value.trim();
+    const duration = parseInt(document.getElementById('exam-duration').value);
+    const checklist = document.getElementById('question-checklist');
+    const questionIds = checklist ? [...checklist.querySelectorAll('input:checked')].map(cb => cb.value) : [];
+    if (!name) { showToast('Vui lòng nhập tên đề thi', 'error'); return; }
+    if (!duration || duration < 1) { showToast('Thời gian không hợp lệ', 'error'); return; }
+    if (questionIds.length === 0) { showToast('Vui lòng chọn ít nhất 1 câu hỏi', 'error'); return; }
+    if (isEdit) {
+      Store.updateExam(editId, { name, duration, questionIds });
+      showToast('Đã cập nhật đề thi', 'success');
+    } else {
+      Store.addExam({ name, duration, questionIds });
+      showToast('Đã tạo đề thi', 'success');
+    }
+    navigate('exams');
+  };
+}
+
+// --- EXAM SESSION ---
+function renderExamSession(app, examId) {
+  const exam = Store.getExam(examId);
+  if (!exam) {
+    app.innerHTML = `<div class="empty-state"><p>Không tìm thấy đề thi.</p><a href="#exams" class="btn btn-primary">Quay lại</a></div>`;
+    return;
+  }
+
+  // Init session if needed
+  if (!currentExamSession || currentExamSession.examId !== examId || currentExamSession.finished) {
+    const questions = exam.questionIds.map(id => Store.getQuestion(id)).filter(Boolean).map(q => ({...q}));
+    if (questions.length === 0) {
+      app.innerHTML = `<div class="empty-state"><p>Đề thi không có câu hỏi hợp lệ.</p><a href="#exams" class="btn btn-primary">Quay lại</a></div>`;
+      return;
+    }
+    currentExamSession = {
+      examId,
+      examName: exam.name,
+      duration: exam.duration,
+      questions,
+      selectedAnswers: new Array(questions.length).fill(-1),
+      currentIndex: 0,
+      timeRemaining: exam.duration * 60,
+      startTime: Date.now(),
+      finished: false,
+    };
+    startExamTimer();
+  }
+
+  renderExamQuestion(app);
+}
+
+function startExamTimer() {
+  clearExamTimer();
+  const timer = document.getElementById('header-timer');
+  timer.style.display = 'block';
+  updateTimerDisplay();
+  examTimerInterval = setInterval(() => {
+    if (!currentExamSession || currentExamSession.finished) { clearExamTimer(); return; }
+    currentExamSession.timeRemaining--;
+    updateTimerDisplay();
+    if (currentExamSession.timeRemaining <= 0) {
+      clearExamTimer();
+      examAutoSubmit();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const timer = document.getElementById('header-timer');
+  if (!currentExamSession) { timer.style.display = 'none'; return; }
+  timer.textContent = formatTime(Math.max(0, currentExamSession.timeRemaining));
+  timer.classList.toggle('danger', currentExamSession.timeRemaining <= 60);
+}
+
+function examAutoSubmit() {
+  if (!currentExamSession || currentExamSession.finished) return;
+  showToast('Hết giờ! Bài thi đã được nộp tự động.', 'info');
+  finishExam();
+}
+
+function renderExamQuestion(app) {
+  const s = currentExamSession;
+  if (s.finished) { renderExamResult(app); return; }
+  const q = s.questions[s.currentIndex];
+  const answered = s.selectedAnswers[s.currentIndex] !== -1;
+
+  let html = `<div class="card">`;
+  // Question navigation
+  html += `<div class="question-nav">`;
+  s.questions.forEach((_, i) => {
+    let cls = 'q-btn';
+    if (i === s.currentIndex) cls += ' current';
+    else if (s.selectedAnswers[i] !== -1) cls += ' answered';
+    html += `<button class="${cls}" onclick="examGoTo(${i})">${i+1}</button>`;
+  });
+  html += `</div>`;
+
+  const progress = (s.currentIndex / s.questions.length * 100);
+  html += `
+    <div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-weight:600;color:var(--gray-600);">Câu ${s.currentIndex + 1} / ${s.questions.length}</span>
+    </div>
+    <h3 style="margin-bottom:16px;line-height:1.6;">${escapeHtml(q.text)}</h3>
+    <div id="exam-options">`;
+  q.answers.forEach((a, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === s.selectedAnswers[s.currentIndex] && i !== q.correctIndex) cls += ' wrong';
+    } else if (i === s.selectedAnswers[s.currentIndex]) {
+      cls += ' selected';
+    }
+    html += `<button class="${cls}" onclick="examSelect(${i})"><span class="option-label">${LABELS[i]}</span>${escapeHtml(a)}</button>`;
+  });
+  html += `</div>`;
+
+  // Navigation buttons
+  html += `<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">`;
+  if (s.currentIndex > 0) {
+    html += `<button class="btn btn-outline btn-sm" onclick="examGoTo(${s.currentIndex - 1})">&#9664; Câu trước</button>`;
+  }
+  if (answered && s.currentIndex < s.questions.length - 1) {
+    html += `<button class="btn btn-primary btn-sm" onclick="examGoTo(${s.currentIndex + 1})">Câu tiếp &#9654;</button>`;
+  }
+  html += `<button class="btn btn-danger btn-sm" style="margin-left:auto;" onclick="examSubmit()">Nộp bài</button>`;
+  html += `</div></div>`;
+  app.innerHTML = html;
+}
+
+function examSelect(idx) {
+  const s = currentExamSession;
+  if (s.selectedAnswers[s.currentIndex] !== -1) return;
+  s.selectedAnswers[s.currentIndex] = idx;
+  renderExamQuestion(document.getElementById('app'));
+}
+
+function examGoTo(idx) {
+  currentExamSession.currentIndex = idx;
+  renderExamQuestion(document.getElementById('app'));
+}
+
+async function examSubmit() {
+  const s = currentExamSession;
+  const unanswered = s.selectedAnswers.filter(a => a === -1).length;
+  let msg = 'Bạn có chắc muốn nộp bài?';
+  if (unanswered > 0) msg += ` Còn ${unanswered} câu chưa trả lời.`;
+  if (await showConfirm('Nộp bài', msg)) {
+    finishExam();
+  }
+}
+
+function finishExam() {
+  const s = currentExamSession;
+  s.finished = true;
+  clearExamTimer();
+  document.getElementById('header-timer').style.display = 'none';
+  const score = s.questions.reduce((sum, q, i) => sum + (s.selectedAnswers[i] === q.correctIndex ? 1 : 0), 0);
+  const timeTaken = Math.round((Date.now() - s.startTime) / 1000);
+  Store.addExamHistory({
+    examId: s.examId,
+    examName: s.examName,
+    duration: s.duration,
+    timeTaken,
+    questions: s.questions,
+    selectedAnswers: s.selectedAnswers,
+    score,
+    total: s.questions.length,
+  });
+  renderExamResult(document.getElementById('app'));
+}
+
+function renderExamResult(app) {
+  const s = currentExamSession;
+  const score = s.questions.reduce((sum, q, i) => sum + (s.selectedAnswers[i] === q.correctIndex ? 1 : 0), 0);
+  const pct = Math.round(score / s.questions.length * 100);
+  const cls = pct >= 50 ? 'good' : 'bad';
+  const timeTaken = Math.round((Date.now() - s.startTime) / 1000);
+
+  let html = `
+    <div class="card">
+      <h2 style="text-align:center;margin-bottom:8px;">${escapeHtml(s.examName)}</h2>
+      <div class="result-score ${cls}">
+        <div class="score-number">${score}/${s.questions.length}</div>
+        <div class="score-label">${pct}% đúng &bull; Thời gian: ${formatTime(timeTaken)}</div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;">
+        <button class="btn btn-success" onclick="currentExamSession=null;navigate('exam/${s.examId}')">Làm lại</button>
+        <a href="#exams" class="btn btn-outline">Quay lại</a>
+      </div>
+    </div>
+    <h3 style="margin:20px 0 12px;">Chi tiết</h3>`;
+  s.questions.forEach((q, i) => {
+    const sel = s.selectedAnswers[i];
+    const correct = sel === q.correctIndex;
+    html += `
+      <div class="review-item ${correct ? 'correct-review' : 'wrong-review'}">
+        <div class="q-text">Câu ${i+1}: ${escapeHtml(q.text)}</div>
+        ${sel === -1
+          ? `<div class="answer-line not-answered">Chưa trả lời</div><div class="answer-line correct-ans">Đáp án đúng: ${LABELS[q.correctIndex]}. ${escapeHtml(q.answers[q.correctIndex])}</div>`
+          : sel !== q.correctIndex
+            ? `<div class="answer-line user-wrong">Bạn chọn: ${LABELS[sel]}. ${escapeHtml(q.answers[sel])}</div><div class="answer-line correct-ans">Đáp án đúng: ${LABELS[q.correctIndex]}. ${escapeHtml(q.answers[q.correctIndex])}</div>`
+            : `<div class="answer-line correct-ans">Bạn chọn đúng: ${LABELS[sel]}. ${escapeHtml(q.answers[sel])}</div>`}
+      </div>`;
+  });
+  app.innerHTML = html;
+}
+
+// --- HISTORY ---
+function renderHistory(app) {
+  const hash = location.hash;
+  const activeTab = hash.includes('tab=exam') ? 'exam' : 'practice';
+  const ph = Store.getPracticeHistory();
+  const eh = Store.getExamHistory();
+
+  let html = `
+    <h2 style="margin-bottom:16px;">Lịch sử</h2>
+    <div class="tabs">
+      <button class="tab-btn ${activeTab === 'practice' ? 'active' : ''}" onclick="location.hash='#history';router()">Ôn tập (${ph.length})</button>
+      <button class="tab-btn ${activeTab === 'exam' ? 'active' : ''}" onclick="location.hash='#history?tab=exam';router()">Thi (${eh.length})</button>
+    </div>`;
+
+  if (activeTab === 'practice') {
+    if (ph.length === 0) {
+      html += `<div class="empty-state"><p>Chưa có lịch sử ôn tập.</p></div>`;
+    } else {
+      ph.forEach(h => {
+        const pct = Math.round(h.score / h.total * 100);
+        html += `
+          <div class="card" style="cursor:pointer;" onclick="navigate('history/practice/${h.id}')">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-weight:600;">Ôn tập - ${h.total} câu</div>
+                <div style="font-size:13px;color:var(--gray-500);">${formatDate(h.timestamp)}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:20px;font-weight:700;color:${pct >= 50 ? 'var(--success)' : 'var(--danger)'};">${h.score}/${h.total}</div>
+                <div style="font-size:13px;color:var(--gray-500);">${pct}%</div>
+              </div>
+            </div>
+          </div>`;
+      });
+    }
+  } else {
+    if (eh.length === 0) {
+      html += `<div class="empty-state"><p>Chưa có lịch sử thi.</p></div>`;
+    } else {
+      eh.forEach(h => {
+        const pct = Math.round(h.score / h.total * 100);
+        html += `
+          <div class="card" style="cursor:pointer;" onclick="navigate('history/exam/${h.id}')">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-weight:600;">${escapeHtml(h.examName)}</div>
+                <div style="font-size:13px;color:var(--gray-500);">${formatDate(h.timestamp)} &bull; ${formatTime(h.timeTaken || 0)}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:20px;font-weight:700;color:${pct >= 50 ? 'var(--success)' : 'var(--danger)'};">${h.score}/${h.total}</div>
+                <div style="font-size:13px;color:var(--gray-500);">${pct}%</div>
+              </div>
+            </div>
+          </div>`;
+      });
+    }
+  }
+  app.innerHTML = html;
+}
+
+function renderHistoryDetail(app, type, id) {
+  let h;
+  if (type === 'practice') {
+    h = Store.getPracticeHistory().find(x => x.id === id);
+  } else {
+    h = Store.getExamHistory().find(x => x.id === id);
+  }
+  if (!h) {
+    app.innerHTML = `<div class="empty-state"><p>Không tìm thấy.</p><a href="#history" class="btn btn-primary">Quay lại</a></div>`;
+    return;
+  }
+  const pct = Math.round(h.score / h.total * 100);
+  const cls = pct >= 50 ? 'good' : 'bad';
+
+  let html = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <a href="#history${type === 'exam' ? '?tab=exam' : ''}" class="btn btn-outline btn-sm">&#9664; Quay lại</a>
+        <span style="font-size:13px;color:var(--gray-500);">${formatDate(h.timestamp)}</span>
+      </div>
+      ${type === 'exam' ? `<h2 style="text-align:center;">${escapeHtml(h.examName)}</h2>` : '<h2 style="text-align:center;">Ôn tập</h2>'}
+      <div class="result-score ${cls}">
+        <div class="score-number">${h.score}/${h.total}</div>
+        <div class="score-label">${pct}% đúng${type === 'exam' && h.timeTaken ? ` &bull; ${formatTime(h.timeTaken)}` : ''}</div>
+      </div>
+    </div>
+    <h3 style="margin:20px 0 12px;">Chi tiết</h3>`;
+  h.questions.forEach((q, i) => {
+    const sel = h.selectedAnswers[i];
+    const correct = sel === q.correctIndex;
+    html += `
+      <div class="review-item ${correct ? 'correct-review' : 'wrong-review'}">
+        <div class="q-text">Câu ${i+1}: ${escapeHtml(q.text)}</div>
+        ${sel === -1
+          ? `<div class="answer-line not-answered">Chưa trả lời</div><div class="answer-line correct-ans">Đáp án đúng: ${LABELS[q.correctIndex]}. ${escapeHtml(q.answers[q.correctIndex])}</div>`
+          : sel !== q.correctIndex
+            ? `<div class="answer-line user-wrong">Bạn chọn: ${LABELS[sel]}. ${escapeHtml(q.answers[sel])}</div><div class="answer-line correct-ans">Đáp án đúng: ${LABELS[q.correctIndex]}. ${escapeHtml(q.answers[q.correctIndex])}</div>`
+            : `<div class="answer-line correct-ans">Bạn chọn đúng: ${LABELS[sel]}. ${escapeHtml(q.answers[sel])}</div>`}
+      </div>`;
+  });
+  app.innerHTML = html;
+}
+</script>
+</body>
+</html>
