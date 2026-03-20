@@ -1,0 +1,12 @@
+[
+  {
+    "text": "[E2E] Cau hoi JSON 1?",
+    "answers": ["Dap an A", "Dap an B", "Dap an C", "Dap an D"],
+    "correctAnswer": "A"
+  },
+  {
+    "text": "[E2E] Cau hoi JSON 2?",
+    "answers": ["Dap an A", "Dap an B", "Dap an C", "Dap an D"],
+    "correctAnswer": "B"
+  }
+]
